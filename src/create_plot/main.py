@@ -16,6 +16,7 @@ def plot_main(min_edge, word_freq_type, display_word_num):
     # netスラングとうに対応できないことが多いためNEologd推奨
     try:
         # windows用のユーザー辞書設定
+        # 多分このパス上にあるはず
         if os.name =='nt':
             spliter = MeCab.Tagger(r'-d "C:/Program Files (x86)/MeCab/dic/ipadic" -u "data/mecab_dictionaly/mecab-user-dict-seed.20200910.dic"')
 
@@ -23,7 +24,7 @@ def plot_main(min_edge, word_freq_type, display_word_num):
         elif os.name =='posix':
             spliter = MeCab.Tagger(r'-d "macのmecab-ipadic-neologdのフォルダーパスを記入"')
     except:
-        tagger = MeCab.Tagger()
+        spliter = MeCab.Tagger()
 
     with open('config/load_config.yaml') as file:
         config = yaml.safe_load(file)

@@ -1,7 +1,8 @@
-import concurrent.futures
-import sys
+# import concurrent.futures
+# import sys
+# import http.server
+# import socketserver
 
-def run_app():
-    from src import view
-executor = concurrent.futures.ThreadPoolExecutor()
-executor.submit(run_app)
+
+from src import view
+
