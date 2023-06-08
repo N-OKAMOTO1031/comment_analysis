@@ -50,7 +50,7 @@ def check_live(video_url):
     try:
         chat_id, video_id = get_youtube_info.get_chat_id(video_url, config['youtube_api_key'])
     except:
-        return 'This video is not live'
+        return 'This video is not live or you may have reached the daily comment acquisition limit.'
 
     if type(chat_id)==str and type(video_id) == str:
         live_status = 'Now Live'
@@ -281,7 +281,7 @@ def execution_plot(n_trials,
                 return None, None, None, None, interval_children
             
             if type(chat_id)==str and type(video_id) == str:
-                interval_children = html.P('コメントを取得したデータが確認できません。コメント取得処理が動いていない可能性があります。',
+                interval_children = html.P('コメントを取得したデータが確認できません。コメント取得処理側で処理が終了している可能性があります。YoutubeAPIの一日の取得制限等をご確認ください。',
                                            style={"fontSize": 30, 'textAlign': 'center', 'color':'red'})
                 
                 return None, None, None, None, interval_children
@@ -383,7 +383,7 @@ def execution_plot(n_intervals,
             return word_freq_fig_old, co_networks_children_old, fig_sunburst_old, fig_word_cloud_old, interval_children
         
         if type(chat_id)==str and type(video_id) == str:
-            interval_children = html.P('コメントを取得したデータが確認できません。コメント取得処理が動いていない可能性があります。',
+            interval_children = html.P('コメントを取得したデータが確認できません。コメント取得処理側で処理が終了している可能性があります。YoutubeAPIの一日の取得制限等をご確認ください。',
                                         style={"fontSize": 30, 'textAlign': 'center', 'color':'red'})
             
             return word_freq_fig_old, co_networks_children_old, fig_sunburst_old, fig_word_cloud_old, interval_children
