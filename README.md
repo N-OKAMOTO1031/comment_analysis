@@ -28,6 +28,9 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 ## 概要
 Youtube Liveのコメントを、MeCabを使用して形態素解析を行い分かち書きしたうえでNlPlotを使用してリアルタイムに解析していくアプリです。  
+NlPlotの詳細に関しては以下のリンクを確認してください。  
+作成者のブログ:https://www.takapy.work/entry/2020/05/17/192947  
+ソースコード:https://github.com/takapy0210/nlplot  
 Dashで作られたWebアプリケーションになっていますが、各個人のローカルで動かすことを想定して作っており、基本的にどこかのサーバーにデプロイして運用することは想定していません。
 
 ### 画面構成
