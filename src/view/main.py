@@ -270,7 +270,11 @@ def execution_plot(n_trials,
 
         # データがなかった場合状況を確認して対応を返す
         try:
-            comment_df_len = len(pd.read_csv('data/comment_df.csv'))
+            f = open('data/comment_list.txt', 'r', encoding = 'utf-8')
+            data = f.read()
+            f.close()
+            comment_list = data.split('\n')
+            comment_df_len = len(comment_list)
         except FileNotFoundError:
             try:
                 chat_id, video_id = get_youtube_info.get_chat_id(config['video_url'], config['youtube_api_key'])
