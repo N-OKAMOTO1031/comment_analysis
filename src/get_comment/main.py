@@ -29,12 +29,13 @@ while True:
                                                     chat_id, 
                                                     config['youtube_api_key'],
                                                     pageToken)
-        comment_df = pd.DataFrame({'comment':comment_list})
         os.makedirs('data', exist_ok=True)
-        comment_df.to_csv('data/comment_df.csv', index=False) 
+        with open('data/comment_list.txt', 'w', encoding = 'utf-8') as f:
+            f.write('\n'.join(comment_list))
+
         time.sleep(config['refresh_rate_comment'])
     except:
             break
 os.makedirs('data/comment_archive', exist_ok=True)
-os.rename('data/comment_df.csv', f'data/comment_archive/{datetime.datetime.now().strftime("%Y%m%d")}_{video_id}_comment_df.csv')
+os.rename('data/comment_list.txt', f'data/comment_archive/{datetime.datetime.now().strftime("%Y%m%d")}_{video_id}_comment_list.txt')
 
