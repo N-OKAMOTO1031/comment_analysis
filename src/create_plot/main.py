@@ -34,23 +34,26 @@ def plot_main(min_edge, word_freq_type, display_word_num):
         return min_edge, None, None, None, None
 
 
-    df = pd.read_csv('data/comment_df.csv')
+    f = open('data/comment_list.txt', 'r', encoding = 'utf-8')
+    data = f.read()
+    f.close()
+    comment_list = data.split('\n')
 
-    df['split_word'] = df['comment'].apply(lambda x:split_comment.get_specified_word(x,
-                                                                                    spliter, 
-                                                                                    config['except_part_of_speech_list'], 
-                                                                                    config['except_word_list']))
+    split_word_list = [split_comment.get_specified_word(x,
+                                                        spliter, 
+                                                        config['except_part_of_speech_list'], 
+                                                        config['except_word_list']) for x in comment_list]
     
     # 単語出現頻度をプロット
     try:
-        word_freq_fig = plot_word_freq_plot(itertools.chain.from_iterable(df['split_word'].to_list()),
+        word_freq_fig = plot_word_freq_plot(itertools.chain.from_iterable(split_word_list),
                                             word_freq_type, 
                                             display_word_num)
     except:
         word_freq_fig = None
 
     # nlplotの設定
-    npt = nlplot.NLPlot(df, target_col='split_word')
+    npt = nlplot.NLPlot(pd.DataFrame({'split_word':split_word_list}), target_col='split_word')
     stopwords = npt.get_stopword(top_n=2, min_freq=0)
 
     # 共起ネットワークのプロットを作成
