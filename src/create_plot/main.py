@@ -157,7 +157,7 @@ def plot_co_network(npt, min_edge, stopwords):
         cal_node = True
         while cal_node:
             npt.build_graph(stopwords=stopwords, min_edge_frequency=min_edge)
-            if len(npt.node_df)<=100:
+            if len(npt.node_df)<=50:
                 cal_node = False
             else:
                 min_edge += 10
@@ -169,7 +169,7 @@ def plot_co_network(npt, min_edge, stopwords):
     cal_node = True
     while cal_node:
         npt.build_graph(stopwords=stopwords, min_edge_frequency=min_edge)
-        if len(npt.node_df)<=100:
+        if len(npt.node_df)<=50:
             cal_node = False
         else:
             min_edge += 1
