@@ -11,7 +11,9 @@ html.Div(
             [
                 html.P('comment load setting')
             ],
-            style={"height": "10vh", "fontSize": 30, 'textAlign': 'center'}
+            style={"height": "10vh",
+                   "fontSize":30,
+                   'textAlign': 'center'}
         ),
         dbc.Row(
             [
@@ -150,7 +152,7 @@ def plot_layout():
     co_networks_plot_tab = \
         dbc.Card(
                 [
-                    dbc.Row(id = 'co_networks_plot_row', children = []),
+                    dbc.Row(id = 'co_networks_plot_row', children = [],),
                     dbc.Row(id = 'sunburst_plot_row', children = []),
                 ]
                 )
@@ -165,12 +167,17 @@ def plot_layout():
         html.Div(
             children=[
                 dbc.Tabs([
-                    dbc.Tab(id = 'word_frequency', children = [word_frequency_plot_tab], label="単語出現頻度"),
-                    dbc.Tab(id = 'co_networks', children = [co_networks_plot_tab], label="共起ネットワーク"),
-                    dbc.Tab(id = 'word_cloud', children = [word_cloud_tab], label='ワードクラウド'),
-                ],
-                
-                    )
+                    dbc.Tab(id = 'word_frequency',
+                            children = [word_frequency_plot_tab], 
+                            label="単語出現頻度",
+                            ),
+                    dbc.Tab(id = 'co_networks', 
+                            children = [co_networks_plot_tab], 
+                            label="共起ネットワーク",),
+                    dbc.Tab(id = 'word_cloud', 
+                            children = [word_cloud_tab], 
+                            label='ワードクラウド',),
+                        ])
                     ]
                 )
     return plot
