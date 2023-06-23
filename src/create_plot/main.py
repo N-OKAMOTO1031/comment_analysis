@@ -157,7 +157,7 @@ def plot_co_network(npt, min_edge, stopwords):
         cal_node = True
         while cal_node:
             npt.build_graph(stopwords=stopwords, min_edge_frequency=min_edge)
-            if len(npt.node_df)<=50:
+            if len(npt.node_df)<=100:
                 cal_node = False
             else:
                 min_edge += 10
@@ -169,7 +169,7 @@ def plot_co_network(npt, min_edge, stopwords):
     cal_node = True
     while cal_node:
         npt.build_graph(stopwords=stopwords, min_edge_frequency=min_edge)
-        if len(npt.node_df)<=50:
+        if len(npt.node_df)<=100:
             cal_node = False
         else:
             min_edge += 1
@@ -179,8 +179,8 @@ def plot_co_network(npt, min_edge, stopwords):
             sizing=100,
             node_size='adjacency_frequency',
             color_palette='hls',
-            width=800,
-            height=700,
+            width=None,
+            height=900,
             save=False
         )
     except:
@@ -191,8 +191,8 @@ def plot_co_network(npt, min_edge, stopwords):
                                     title='sunburst chart',
                                     colorscale=True,
                                     color_continuous_scale='Oryel',
-                                    width=800,
-                                    height=800,
+                                    width=None,
+                                    height=600,
                                     save=False
                                     )
     except:
@@ -218,8 +218,8 @@ def plot_word_cloud(npt, stopwords):
 
     """
     fig_wc = npt.wordcloud(
-    width=1000,
-    height=700,
+    # width=1000,
+    # height=700,
     max_words=100,
     max_font_size=100,
     colormap='tab20_r',
