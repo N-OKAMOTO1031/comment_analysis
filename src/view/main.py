@@ -18,6 +18,7 @@ import get_youtube_info
 
 
 app = dash.Dash(external_stylesheets=[dbc.themes.FLATLY], suppress_callback_exceptions=True)
+app.title = 'comment analysis'
 
 setting = layouts.setting_layout()
 plot = layouts.plot_layout()
@@ -29,7 +30,7 @@ app.layout = dbc.Container(
                 dbc.Col(setting, width=3, className='bg-light'),
                 dbc.Col(plot, width=9)
             ],
-            style={"height": "100vh"}
+            style={"height": "200vh"}
         ),
         html.Div(id='interval_div')
     ],
