@@ -3,7 +3,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import itertools
 import os
-import yaml
 from create_plot import split_comment
 import MeCab
 import plotly.graph_objects as go
@@ -26,13 +25,15 @@ def plot_main(min_edge, word_freq_type, display_word_num):
     except:
         spliter = MeCab.Tagger()
 
-    with open('config/load_config.yaml') as file:
-        config = yaml.safe_load(file)
-
     # 全部選択されている場合はNoneを返す
-    if len(config['except_part_of_speech_list'])==13:
+    except_part_of_speech_list = os.getenv('except_part_of_speech_list').split(',')
+    if len(except_part_of_speech_list)==13:
         return min_edge, None, None, None, None
-
+    
+    if os.getenv('except_word_list') == None:
+        except_word_list = []
+    else:
+        except_word_list = os.getenv('except_word_list').split(',')
 
     f = open('data/comment_list.txt', 'r', encoding = 'utf-8')
     data = f.read()
@@ -41,8 +42,8 @@ def plot_main(min_edge, word_freq_type, display_word_num):
 
     split_word_list = [split_comment.get_specified_word(x,
                                                         spliter, 
-                                                        config['except_part_of_speech_list'], 
-                                                        config['except_word_list']) for x in comment_list]
+                                                        except_part_of_speech_list, 
+                                                        except_word_list) for x in comment_list]
     
     # 単語出現頻度をプロット
     try:
