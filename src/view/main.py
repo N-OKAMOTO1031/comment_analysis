@@ -1,9 +1,9 @@
 import pandas as pd
+import os
 import dash
 from dash import dcc
 import dash_bootstrap_components as dbc
 from dash import html
-import yaml
 import sys
 import concurrent.futures
 import datetime
@@ -43,13 +43,11 @@ app.layout = dbc.Container(
         dash.Input('video_url', 'value')
 )
 def check_live(video_url):
-    with open('config/api_config.yaml') as file:
-            config = yaml.safe_load(file)
     if video_url == None:
         return
     
     try:
-        chat_id, video_id = get_youtube_info.get_chat_id(video_url, config['youtube_api_key'])
+        chat_id, video_id = get_youtube_info.get_chat_id(video_url, os.getenv('youtube_api_key'))
     except:
         return 'This video is not live or you may have reached the daily comment acquisition limit.'
 
@@ -101,9 +99,8 @@ def setting_complete(n_clicks,
         
         else:
             try:
-                with open('config/api_config.yaml') as file:
-                    config = yaml.safe_load(file)
-                chat_id, video_id = get_youtube_info.get_chat_id(video_url, config['youtube_api_key'])
+                chat_id, video_id = get_youtube_info.get_chat_id(video_url, 
+                                                                 os.getenv('youtube_api_key'))
             except:
                 if len(button_children)>1:
                     button_children = button_children[:1]
@@ -122,30 +119,25 @@ def setting_complete(n_clicks,
         
         # 除外単語用の処理
         if except_word == None:
-            except_word_list = []
+            except_word = ''
         else:
             except_word = except_word.replace(' ', ',')
             except_word = except_word.replace('　', ',')
             except_word = except_word.replace('、', ',')
-            except_word_list = except_word.split(',')
+            # except_word_list = except_word.split(',')
 
         
-        with open('config/api_config.yaml') as file:
-            config = yaml.safe_load(file)
+        os.environ['video_url'] = video_url
+        os.environ['refresh_rate_comment'] = str(refresh_rate_comment)
+        os.environ['refresh_rate_plot'] = str(refresh_rate_plot)
+        os.environ['except_part_of_speech_list'] = ''.join(except_part_of_speech_1 + except_part_of_speech_2)
+        os.environ['except_word'] = except_word
 
-        with open("config/load_config.yaml", "w") as yf:
-            load_config = {}
-            load_config['youtube_api_key'] = config['youtube_api_key']
-            load_config['video_url'] = video_url
-            load_config['refresh_rate_comment'] = refresh_rate_comment
-            load_config['refresh_rate_plot'] = refresh_rate_plot
-            load_config['except_part_of_speech_list'] = except_part_of_speech_1 + except_part_of_speech_2
-            load_config['except_word_list'] = except_word_list
-            
-            yaml.dump(load_config, yf)
         ## 実行ボタンを配置
-        execution_child = [dbc.Button("コメント解析を実行", id="execution",
-                                    className="execution", n_clicks=0)]
+        execution_child = [dbc.Button("コメント解析を実行",
+                                      id="execution",
+                                      className="execution", 
+                                      n_clicks=0)]
         return execution_child
     
 # コメント解析を実行時の処理
@@ -197,34 +189,24 @@ def change_setting(n_clicks,
     else:
         # 除外単語用の処理
         if except_word == None:
-            except_word_list = []
+            except_word = ''
         else:
             except_word = except_word.replace(' ', ',')
             except_word = except_word.replace('　', ',')
             except_word = except_word.replace('、', ',')
-            except_word_list = except_word.split(',')
+            # except_word_list = except_word.split(',')
         
         # 変更された設定値を保存
-        with open('config/load_config.yaml') as file:
-            last_config = yaml.safe_load(file)
+        if refresh_rate_comment!=None:
+            os.environ['refresh_rate_comment'] = str(refresh_rate_comment)
 
-        with open("config/load_config.yaml", "w") as yf:
-            load_config = {}
-            load_config['youtube_api_key'] = last_config['youtube_api_key']
-            load_config['video_url'] = last_config['video_url']
-            if refresh_rate_comment==None:
-                load_config['refresh_rate_comment'] = last_config['refresh_rate_comment']
-            else:
-                load_config['refresh_rate_comment'] = refresh_rate_comment
+        if refresh_rate_plot!=None:
+            os.environ['refresh_rate_plot'] = str(refresh_rate_plot)
+        
 
-            if refresh_rate_plot==None:
-                load_config['refresh_rate_plot'] = last_config['refresh_rate_plot']
-            else:
-                load_config['refresh_rate_plot'] = refresh_rate_plot
-            load_config['except_part_of_speech_list'] = except_part_of_speech_1 + except_part_of_speech_2
-            load_config['except_word_list'] = except_word_list
-            
-            yaml.dump(load_config, yf)
+        os.environ['except_part_of_speech_list'] = ''.join(except_part_of_speech_1 + except_part_of_speech_2)
+        os.environ['except_word_list'] = except_word
+
         ## 変更時間を追記
         if len(button_children)==2:
             button_children[1] = f'{datetime.datetime.now().strftime("%X")}：設定を変更しました'
@@ -265,8 +247,6 @@ def execution_plot(n_trials,
         pass
         return None, None, None, None, None
     else:
-        with open('config/load_config.yaml') as file:
-            config = yaml.safe_load(file)
         time.sleep(2)
 
         # データがなかった場合状況を確認して対応を返す
@@ -278,7 +258,8 @@ def execution_plot(n_trials,
             comment_df_len = len(comment_list)
         except FileNotFoundError:
             try:
-                chat_id, video_id = get_youtube_info.get_chat_id(config['video_url'], config['youtube_api_key'])
+                chat_id, video_id = get_youtube_info.get_chat_id(os.getenv('video_url'),
+                                                                 os.getenv('youtube_api_key'))
             except:
                 interval_children = html.P('Youtube APIの一日のコメント取得数の制限に達した可能性があります。確認してください。',
                                            style={"fontSize": 30, 'textAlign': 'center', 'color':'red'})
@@ -299,7 +280,7 @@ def execution_plot(n_trials,
 
         if comment_df_len < 100:
             # intervalを設定
-            interval_children = dcc.Interval(id='interval_not_plot', interval=config['refresh_rate_plot']*1000)
+            interval_children = dcc.Interval(id='interval_not_plot', interval=int(os.getenv('refresh_rate_plot'))*1000)
             return None, None, None, None, interval_children
         else:
             # 各plotを取得
@@ -329,19 +310,13 @@ def execution_plot(n_trials,
                 word_cloud_children = [(dcc.Graph(id = 'word_cloud_plot', figure = fig_word_cloud))]
 
             # min_edgeを保存
-            with open("config/co_network_config.yaml", "w") as yf:
-                co_network_config = {}
-                co_network_config['min_edge'] = min_edge
-                yaml.dump(co_network_config, yf)
+            os.environ['min_edge'] = str(min_edge)
 
             # intervalを設定、どれか一つでも返ってきてなかった場合はもう一度この関数を動かす
-            with open('config/load_config.yaml') as file:
-                config = yaml.safe_load(file)
-
             if (word_freq_fig == None) or (fig_co_network == None) or (fig_sunburst == None) or (fig_word_cloud == None):
-                interval_children = dcc.Interval(id='interval_not_plot', interval=config['refresh_rate_plot']*1000)
+                interval_children = dcc.Interval(id='interval_not_plot', interval=int(os.getenv('refresh_rate_plot'))*1000)
             else:
-                interval_children = dcc.Interval(id='interval_plot', interval=config['refresh_rate_plot']*1000)
+                interval_children = dcc.Interval(id='interval_plot', interval=int(os.getenv('refresh_rate_plot'))*1000)
 
         return  word_freq_children, co_networks_children, sunburst_children, word_cloud_children, interval_children
 
@@ -369,18 +344,16 @@ def execution_plot(n_intervals,
                    word_freq_type, 
                    display_word_num,
                    ):
-    with open('config/co_network_config.yaml') as file:
-        co_network_config = yaml.safe_load(file)
-
-    with open('config/load_config.yaml') as file:
-        config = yaml.safe_load(file)
     # 各plotを取得
     try:
-        min_edge, word_freq_fig, fig_co_network, fig_sunburst, fig_word_cloud = create_plot.main.plot_main(co_network_config['min_edge'], word_freq_type, display_word_num)
+        min_edge, word_freq_fig, fig_co_network, fig_sunburst, fig_word_cloud = create_plot.main.plot_main(int(os.getenv('min_edge')), 
+                                                                                                           word_freq_type, 
+                                                                                                           display_word_num)
     except FileNotFoundError:
         # エラーが発生した場合はライブ状況を確認して状況に応じて対応を返す
         try:
-            chat_id, video_id = get_youtube_info.get_chat_id(config['video_url'], config['youtube_api_key'])
+            chat_id, video_id = get_youtube_info.get_chat_id(os.getenv('video_url'), 
+                                                             os.getenv('youtube_api_key'))
         except:
             interval_children = html.P('Youtube APIの一日のコメント取得数の制限に達した可能性があります。確認してください。',
                                         style={"fontSize": 30, 'textAlign': 'center', 'color':'red'})
@@ -422,13 +395,10 @@ def execution_plot(n_intervals,
         pass
 
     # min_edgeを保存
-    with open("config/co_network_config.yaml", "w") as yf:
-        co_network_config = {}
-        co_network_config['min_edge'] = min_edge
-        yaml.dump(co_network_config, yf)
+    os.environ['min_edge'] = str(min_edge)
     
     # intervalを設定
-    interval_children = dcc.Interval(id='interval_plot', interval=config['refresh_rate_plot']*1000)
+    interval_children = dcc.Interval(id='interval_plot', interval=int(os.getenv('refresh_rate_plot'))*1000)
 
     return  word_freq_fig, co_networks_children, fig_sunburst, fig_word_cloud, interval_children
 
